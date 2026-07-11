@@ -30,7 +30,7 @@
     <svg viewBox="0 0 200 20" preserveAspectRatio="none"><path d="M0,10 Q25,0 50,10 T100,10 T150,10 T200,10" /></svg>
   </div>
   <h1 class="title">الخلاصة الحسناء</h1>
-  <p class="subtitle">في متابعة أذكار الصباح والمساء — مستلّة من كتاب الشيخ صالح العصيمي</p>
+  <p class="subtitle">أذكار الصباح والمساء من كتاب الخلاصة الحسناء للشيخ صالح العصيمي، وأذكار النوم من حصن المسلم وكتاب الأذكار للشيخ عبدالمحسن القاسم</p>
 
   <nav class="tabs" role="tablist">
     <button class="tab" data-tab="morning" role="tab" aria-selected="true">
@@ -40,6 +40,10 @@
     <button class="tab" data-tab="evening" role="tab" aria-selected="false">
       <span class="tab-icon">🌙</span>
       <span>أذكار المساء</span>
+    </button>
+    <button class="tab" data-tab="sleep" role="tab" aria-selected="false">
+      <span class="tab-icon">🌌</span>
+      <span>أذكار النوم</span>
     </button>
     <button class="tab" data-tab="stats" role="tab" aria-selected="false">
       <span class="tab-icon">📊</span>
@@ -95,6 +99,26 @@
     <ol class="azkar-list" id="list-evening"></ol>
   </section>
 
+  <section class="session-view" id="view-sleep" data-view hidden>
+    <div class="session-head">
+      <div class="dial" id="dial-sleep">
+        <svg viewBox="0 0 120 120">
+          <circle class="dial-track" cx="60" cy="60" r="52"></circle>
+          <circle class="dial-fill" cx="60" cy="60" r="52"></circle>
+        </svg>
+        <div class="dial-center">
+          <span class="dial-pct" id="pct-sleep">0%</span>
+          <span class="dial-label">إنجاز اليوم</span>
+        </div>
+      </div>
+      <div class="session-actions">
+        <button class="btn-ghost" data-reset="sleep">إعادة تعيين اليوم</button>
+        <button class="btn-solid" data-complete-all="sleep">تعليم الكل كمُنجز</button>
+      </div>
+    </div>
+    <ol class="azkar-list" id="list-sleep"></ol>
+  </section>
+
   <!-- Stats view -->
   <section class="session-view" id="view-stats" data-view hidden>
     <div class="stats-grid">
@@ -121,8 +145,8 @@
     <div class="legend">
       <span class="legend-item"><i class="sw sw-0"></i> لم يتم التسجيل</span>
       <span class="legend-item"><i class="sw sw-1"></i> إنجاز جزئي</span>
-      <span class="legend-item"><i class="sw sw-2"></i> صباح أو مساء كامل</span>
-      <span class="legend-item"><i class="sw sw-3"></i> الصباح والمساء كاملان</span>
+      <span class="legend-item"><i class="sw sw-2"></i> إنجاز قسم كامل (صباح/مساء/نوم)</span>
+      <span class="legend-item"><i class="sw sw-3"></i> الأقسام الثلاثة كاملة</span>
     </div>
 
     <h2 class="section-title">التفصيل الأسبوعي</h2>

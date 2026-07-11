@@ -45,9 +45,10 @@
   }
 
   function ensureDay(key){
-    if(!store.days[key]) store.days[key] = { morning: {}, evening: {} };
+    if(!store.days[key]) store.days[key] = { morning: {}, evening: {}, sleep: {} };
     if(!store.days[key].morning) store.days[key].morning = {};
     if(!store.days[key].evening) store.days[key].evening = {};
+    if(!store.days[key].sleep) store.days[key].sleep = {};
     return store.days[key];
   }
 
@@ -157,7 +158,7 @@
     tabs.forEach(t => t.setAttribute("aria-selected", t.dataset.tab === name ? "true" : "false"));
     views.forEach(v => v.hidden = (v.id !== `view-${name}`));
 
-    if(name === "evening"){
+    if(name === "evening" || name === "sleep"){
       skyEl.classList.add("mode-evening");
       document.body.classList.add("evening-mode");
     } else if(name === "morning"){
@@ -179,7 +180,7 @@
   /* ---------------- الإحصائيات ---------------- */
   function dayCompletion(key){
     const dayData = store.days[key];
-    if(!dayData) return { morning:0, evening:0 };
+    if(!dayData) return { morning:0, evening:0, sleep:0 };
     function pctFor(session){
       const items = AZKAR[session];
       let req=0, done=0;
@@ -190,16 +191,16 @@
       });
       return req === 0 ? 0 : done/req;
     }
-    return { morning: pctFor("morning"), evening: pctFor("evening") };
+    return { morning: pctFor("morning"), evening: pctFor("evening"), sleep: pctFor("sleep") };
   }
 
   function isDayFull(key){
     const c = dayCompletion(key);
-    return c.morning >= 1 && c.evening >= 1;
+    return c.morning >= 1 && c.evening >= 1 && c.sleep >= 1;
   }
   function isDayPartial(key){
     const c = dayCompletion(key);
-    return (c.morning > 0 || c.evening > 0);
+    return (c.morning > 0 || c.evening > 0 || c.sleep > 0);
   }
 
   function computeStreak(){
@@ -246,7 +247,7 @@
     for(let i=0;i<30;i++){
       const key = dateKeyOffset(i);
       const c = dayCompletion(key);
-      rateSum += (c.morning + c.evening) / 2;
+      rateSum += (c.morning + c.evening + c.sleep) / 3;
     }
     document.getElementById("stat-rate30").textContent = Math.round((rateSum/rateCount)*100) + "%";
 
@@ -255,14 +256,12 @@
     heat.innerHTML = "";
     for(let i=29;i>=0;i--){
       const key = dateKeyOffset(i);
-      const full = isDayFull(key);
-      const partial = isDayPartial(key);
+      const c = dayCompletion(key);
+      const sessionsFull = [c.morning, c.evening, c.sleep].filter(v => v >= 1).length;
       let level = 0;
-      if(full) level = 3;
-      else if(partial){
-        const c = dayCompletion(key);
-        level = (c.morning >= 1 || c.evening >= 1) ? 2 : 1;
-      }
+      if(sessionsFull === 3) level = 3;
+      else if(sessionsFull >= 1) level = 2;
+      else if(isDayPartial(key)) level = 1;
       const cell = document.createElement("div");
       cell.className = `hm-cell hm-${level}`;
       cell.title = key;
@@ -276,7 +275,7 @@
     for(let i=6;i>=0;i--){
       const key = dateKeyOffset(i);
       const c = dayCompletion(key);
-      const pct = Math.round(((c.morning + c.evening)/2)*100);
+      const pct = Math.round(((c.morning + c.evening + c.sleep)/3)*100);
       const col = document.createElement("div");
       col.className = "bar-col";
       const d = new Date(key);
@@ -319,6 +318,7 @@
         statusEl.style.color = "#2E7D46";
         renderList("morning");
         renderList("evening");
+        renderList("sleep");
       }catch(err){
         console.error(err);
         statusEl.textContent = "تعذّر قراءة الملف. تأكد أنه ملف نسخة احتياطية صحيح.";
@@ -334,6 +334,7 @@
     saveStore(store);
     renderList("morning");
     renderList("evening");
+    renderList("sleep");
     alert("تم حذف جميع البيانات.");
   });
 
@@ -341,6 +342,7 @@
   function init(){
     renderList("morning");
     renderList("evening");
+    renderList("sleep");
     // اختيار التبويب الافتراضي حسب الوقت الحالي: قبل الظهر صباح، بعده مساء
     const hour = new Date().getHours();
     activateTab(hour >= 15 || hour < 3 ? "evening" : "morning");
