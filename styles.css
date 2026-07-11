@@ -1,0 +1,329 @@
+/* ============================================================
+   نظام التصميم: مخطوطة مضيئة + قوس السماء (فجر ← غروب)
+   الألوان: زيتوني عميق (أصل)، ذهبي إضاءة (تمييز صباح)،
+            نيلي الغسق (تمييز مساء)، رَق المخطوطة (خلفية)
+   ============================================================ */
+:root{
+  --ink:        #2A2116;
+  --parchment:  #F6EFDD;
+  --parchment-2:#EFE4C8;
+  --olive:      #274539;
+  --olive-dark: #16281F;
+  --gold:       #C89B3C;
+  --gold-soft:  #E4C878;
+  --dusk:       #3E3A6B;
+  --dusk-soft:  #6A63A8;
+  --line:       rgba(42,33,22,.14);
+  --card:       #FFFDF6;
+  --shadow:     0 8px 24px rgba(42,33,22,.10);
+  --radius:     18px;
+  --serif: 'Amiri', 'Traditional Arabic', serif;
+  --sans:  'Tajawal', sans-serif;
+}
+
+*{ box-sizing: border-box; }
+html,body{ margin:0; padding:0; }
+body{
+  font-family: var(--sans);
+  color: var(--ink);
+  background: var(--parchment);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* خلفية السماء المتدرّجة تتغيّر بحسب القسم النشط */
+.sky{
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, #FBEFD2 0%, #F6EFDD 55%, #F1E6C9 100%);
+  transition: background 900ms ease;
+}
+.sky.mode-evening{
+  background: linear-gradient(180deg, #1E1B3A 0%, #2C2A55 45%, #3E3A6B 100%);
+}
+.sky.mode-evening ~ * , body.evening-mode{ color-scheme: dark; }
+
+body.evening-mode{ color: #EFE9F5; }
+body.evening-mode .app-header .subtitle{ color: #C9C4E8; }
+body.evening-mode .azkar-card{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.12); }
+body.evening-mode .azkar-text{ color: #F3EFFB; }
+body.evening-mode .stat-card,
+body.evening-mode .backup-card{ background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.12); color:#EFE9F5; }
+body.evening-mode .btn-ghost{ color:#EFE9F5; border-color: rgba(255,255,255,.35); }
+body.evening-mode .tabs{ background: rgba(255,255,255,.08); }
+body.evening-mode .meta-pill{ background: rgba(255,255,255,.12); color:#EFE9F5; }
+
+/* ===================== الترويسة ===================== */
+.app-header{
+  text-align: center;
+  padding: 34px 16px 14px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.ornament svg{ width: 140px; height: 14px; margin-bottom: 6px; }
+.ornament path{ fill:none; stroke: var(--gold); stroke-width: 2; opacity: .7; }
+.title{
+  font-family: var(--serif);
+  font-size: clamp(28px, 6vw, 40px);
+  margin: 0;
+  color: var(--olive-dark);
+  font-weight: 700;
+}
+body.evening-mode .title{ color: var(--gold-soft); }
+.subtitle{
+  margin: 6px 0 20px;
+  font-size: 14px;
+  color: #5B5140;
+  font-weight: 400;
+}
+
+.tabs{
+  display: flex;
+  gap: 6px;
+  background: rgba(39,69,57,.08);
+  border-radius: 999px;
+  padding: 6px;
+  max-width: 620px;
+  margin: 0 auto;
+  overflow-x: auto;
+}
+.tab{
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  padding: 10px 10px;
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--olive-dark);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 200ms, color 200ms;
+}
+body.evening-mode .tab{ color:#D7D2EE; }
+.tab[aria-selected="true"]{
+  background: var(--olive);
+  color: #FBF6E3;
+  box-shadow: var(--shadow);
+}
+body.evening-mode .tab[aria-selected="true"]{
+  background: var(--gold);
+  color: #241E12;
+}
+.tab-icon{ font-size: 15px; }
+
+/* ===================== المحتوى الرئيسي ===================== */
+main{ max-width: 720px; margin: 0 auto; padding: 18px 16px 60px; }
+.session-view[hidden]{ display:none; }
+
+.session-head{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+body.evening-mode .session-head{ background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.12); }
+
+.dial{ position: relative; width: 92px; height: 92px; flex: none; }
+.dial svg{ width:100%; height:100%; transform: rotate(-90deg); }
+.dial-track{ fill:none; stroke: var(--line); stroke-width: 10; }
+.dial-fill{
+  fill:none; stroke: var(--gold); stroke-width: 10; stroke-linecap: round;
+  stroke-dasharray: 326.7; stroke-dashoffset: 326.7;
+  transition: stroke-dashoffset 500ms ease;
+}
+body.evening-mode .dial-fill{ stroke: var(--gold-soft); }
+.dial-center{
+  position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+.dial-pct{ font-weight: 700; font-size: 17px; }
+.dial-label{ font-size: 10px; color:#6B6153; }
+body.evening-mode .dial-label{ color:#C9C4E8; }
+
+.session-actions{ display:flex; flex-direction: column; gap: 8px; }
+
+.btn-ghost, .btn-solid, .btn-danger{
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 999px;
+  padding: 9px 16px;
+  cursor: pointer;
+  border: 1.5px solid var(--olive);
+  background: transparent;
+  color: var(--olive);
+  transition: transform 120ms ease, background 150ms;
+  text-align: center;
+}
+.btn-ghost:hover{ background: rgba(39,69,57,.08); }
+.btn-solid{ background: var(--olive); color: #FBF6E3; border-color: var(--olive); }
+.btn-solid:hover{ transform: translateY(-1px); }
+.btn-danger{ background: #7A2E2E; color:#FCEFEF; border-color:#7A2E2E; }
+.btn-danger:hover{ transform: translateY(-1px); }
+
+/* ===================== قائمة الأذكار ===================== */
+.azkar-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:14px; }
+
+.azkar-card{
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  position: relative;
+  transition: border-color 200ms, background 200ms;
+}
+.azkar-card.done{ border-color: var(--gold); }
+.azkar-card.done::before{
+  content: "";
+}
+
+.azkar-top{ display:flex; align-items:flex-start; gap: 10px; margin-bottom: 10px; }
+
+.azkar-number{
+  flex: none;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold);
+  color: var(--gold);
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 14px;
+}
+.azkar-card.done .azkar-number{ background: var(--gold); color:#fff; }
+
+.azkar-text{
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 2;
+  color: var(--olive-dark);
+  flex: 1;
+}
+.azkar-note{
+  font-size: 12px;
+  color:#8A7A54;
+  margin: 0 0 10px 40px;
+}
+body.evening-mode .azkar-note{ color:#B7AEDD; }
+
+.azkar-bottom{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding-right: 40px;
+}
+.counter{
+  display:flex; align-items:center; gap:10px;
+}
+.counter-btn{
+  width:38px; height:38px; border-radius:50%;
+  border:1.5px solid var(--olive); background:#fff; color:var(--olive);
+  font-size:18px; font-weight:700; cursor:pointer; line-height:1;
+  display:flex; align-items:center; justify-content:center;
+}
+.counter-btn:active{ transform: scale(.92); }
+body.evening-mode .counter-btn{ background: rgba(255,255,255,.08); color:#EFE9F5; border-color: rgba(255,255,255,.3); }
+
+.counter-progress{ font-family: var(--sans); font-weight:700; font-size: 14px; min-width: 64px; text-align:center; }
+.counter-req{ font-size:12px; color:#8A7A54; }
+body.evening-mode .counter-req{ color:#B7AEDD; }
+
+.check-badge{
+  font-size: 13px;
+  font-weight: 700;
+  color: #8A7A54;
+  display:flex; align-items:center; gap:5px;
+}
+.azkar-card.done .check-badge{ color: #2E7D46; }
+body.evening-mode .azkar-card.done .check-badge{ color: var(--gold-soft); }
+
+/* ===================== الإحصائيات ===================== */
+.section-title{
+  font-family: var(--serif);
+  font-size: 20px;
+  margin: 26px 0 14px;
+  color: var(--olive-dark);
+}
+body.evening-mode .section-title{ color: var(--gold-soft); }
+
+.stats-grid{
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.stat-card{
+  background: var(--card); border:1px solid var(--line); border-radius: var(--radius);
+  padding: 18px; text-align:center; box-shadow: var(--shadow);
+}
+.stat-num{ display:block; font-family: var(--serif); font-size: 30px; font-weight:700; color: var(--gold); }
+.stat-label{ font-size: 12px; color:#6B6153; }
+body.evening-mode .stat-label{ color:#C9C4E8; }
+
+.heatmap{
+  display:grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 6px;
+}
+.hm-cell{ aspect-ratio: 1; border-radius: 6px; background: var(--line); }
+.hm-0{ background: var(--line); }
+.hm-1{ background: #D9C27A; }
+.hm-2{ background: #C89B3C; }
+.hm-3{ background: #274539; }
+body.evening-mode .hm-0{ background: rgba(255,255,255,.1); }
+
+.legend{ display:flex; flex-wrap:wrap; gap: 14px; margin-top: 10px; }
+.legend-item{ font-size: 11px; display:flex; align-items:center; gap:5px; color:#6B6153; }
+body.evening-mode .legend-item{ color:#C9C4E8; }
+.sw{ width:12px; height:12px; border-radius:3px; display:inline-block; }
+.sw-0{ background: var(--line); }
+.sw-1{ background:#D9C27A; }
+.sw-2{ background:#C89B3C; }
+.sw-3{ background:#274539; }
+
+.bar-chart{ display:flex; align-items:flex-end; gap: 8px; height: 140px; padding: 10px 4px 0; }
+.bar-col{ flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; height:100%; justify-content:flex-end; }
+.bar{ width: 100%; max-width: 26px; background: linear-gradient(180deg, var(--gold-soft), var(--gold)); border-radius: 5px 5px 0 0; min-height: 3px; }
+.bar-day{ font-size: 10px; color:#6B6153; }
+body.evening-mode .bar-day{ color:#C9C4E8; }
+
+/* ===================== النسخ الاحتياطي ===================== */
+.backup-card{
+  background: var(--card); border:1px solid var(--line); border-radius: var(--radius);
+  padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow);
+}
+.backup-card.danger{ border-color: rgba(122,46,46,.4); }
+.backup-desc{ font-size: 13px; color:#6B6153; line-height:1.9; margin: 6px 0 14px; }
+body.evening-mode .backup-desc{ color:#C9C4E8; }
+.file-btn{ position:relative; display:inline-block; overflow:hidden; }
+.file-btn input{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+.backup-status{ font-size: 12px; margin-top: 10px; color: var(--olive); font-weight:600; }
+body.evening-mode .backup-status{ color: var(--gold-soft); }
+
+/* ===================== التذييل ===================== */
+.app-footer{
+  text-align:center; padding: 24px 16px 40px; font-size: 13px; color:#7A6E56;
+}
+body.evening-mode .app-footer{ color:#B7AEDD; }
+
+@media (max-width: 420px){
+  .stats-grid{ grid-template-columns: 1fr 1fr; }
+  .heatmap{ grid-template-columns: repeat(6,1fr); }
+  .azkar-bottom, .azkar-note{ padding-right:0; margin-right:0; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ transition: none !important; }
+}

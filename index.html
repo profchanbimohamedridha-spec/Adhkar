@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>الخلاصة الحسناء — متابعة أذكار الصباح والمساء</title>
+<meta name="description" content="تطبيق متابعة أذكار الصباح والمساء، مستلة من كتاب الخلاصة الحسناء للشيخ صالح العصيمي">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌙</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="sky" id="sky"></div>
+
+<header class="app-header">
+  <div class="ornament" aria-hidden="true">
+    <svg viewBox="0 0 200 20" preserveAspectRatio="none"><path d="M0,10 Q25,0 50,10 T100,10 T150,10 T200,10" /></svg>
+  </div>
+  <h1 class="title">الخلاصة الحسناء</h1>
+  <p class="subtitle">في متابعة أذكار الصباح والمساء — مستلّة من كتاب الشيخ صالح العصيمي</p>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" data-tab="morning" role="tab" aria-selected="true">
+      <span class="tab-icon">☀️</span>
+      <span>أذكار الصباح</span>
+    </button>
+    <button class="tab" data-tab="evening" role="tab" aria-selected="false">
+      <span class="tab-icon">🌙</span>
+      <span>أذكار المساء</span>
+    </button>
+    <button class="tab" data-tab="stats" role="tab" aria-selected="false">
+      <span class="tab-icon">📊</span>
+      <span>الإحصائيات</span>
+    </button>
+    <button class="tab" data-tab="backup" role="tab" aria-selected="false">
+      <span class="tab-icon">💾</span>
+      <span>النسخ الاحتياطي</span>
+    </button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- Morning / Evening session views -->
+  <section class="session-view" id="view-morning" data-view>
+    <div class="session-head">
+      <div class="dial" id="dial-morning">
+        <svg viewBox="0 0 120 120">
+          <circle class="dial-track" cx="60" cy="60" r="52"></circle>
+          <circle class="dial-fill" cx="60" cy="60" r="52"></circle>
+        </svg>
+        <div class="dial-center">
+          <span class="dial-pct" id="pct-morning">0%</span>
+          <span class="dial-label">إنجاز اليوم</span>
+        </div>
+      </div>
+      <div class="session-actions">
+        <button class="btn-ghost" data-reset="morning">إعادة تعيين اليوم</button>
+        <button class="btn-solid" data-complete-all="morning">تعليم الكل كمُنجز</button>
+      </div>
+    </div>
+    <ol class="azkar-list" id="list-morning"></ol>
+  </section>
+
+  <section class="session-view" id="view-evening" data-view hidden>
+    <div class="session-head">
+      <div class="dial" id="dial-evening">
+        <svg viewBox="0 0 120 120">
+          <circle class="dial-track" cx="60" cy="60" r="52"></circle>
+          <circle class="dial-fill" cx="60" cy="60" r="52"></circle>
+        </svg>
+        <div class="dial-center">
+          <span class="dial-pct" id="pct-evening">0%</span>
+          <span class="dial-label">إنجاز اليوم</span>
+        </div>
+      </div>
+      <div class="session-actions">
+        <button class="btn-ghost" data-reset="evening">إعادة تعيين اليوم</button>
+        <button class="btn-solid" data-complete-all="evening">تعليم الكل كمُنجز</button>
+      </div>
+    </div>
+    <ol class="azkar-list" id="list-evening"></ol>
+  </section>
+
+  <!-- Stats view -->
+  <section class="session-view" id="view-stats" data-view hidden>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-num" id="stat-streak">0</span>
+        <span class="stat-label">أيام متتالية (الالتزام الحالي)</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" id="stat-best-streak">0</span>
+        <span class="stat-label">أفضل التزام متواصل</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" id="stat-total-days">0</span>
+        <span class="stat-label">إجمالي أيام المتابعة</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" id="stat-rate30">0%</span>
+        <span class="stat-label">نسبة الالتزام آخر 30 يومًا</span>
+      </div>
+    </div>
+
+    <h2 class="section-title">آخر 30 يومًا</h2>
+    <div class="heatmap" id="heatmap"></div>
+    <div class="legend">
+      <span class="legend-item"><i class="sw sw-0"></i> لم يتم التسجيل</span>
+      <span class="legend-item"><i class="sw sw-1"></i> إنجاز جزئي</span>
+      <span class="legend-item"><i class="sw sw-2"></i> صباح أو مساء كامل</span>
+      <span class="legend-item"><i class="sw sw-3"></i> الصباح والمساء كاملان</span>
+    </div>
+
+    <h2 class="section-title">التفصيل الأسبوعي</h2>
+    <div class="bar-chart" id="barchart"></div>
+  </section>
+
+  <!-- Backup view -->
+  <section class="session-view" id="view-backup" data-view hidden>
+    <div class="backup-card">
+      <h2 class="section-title">تصدير نسخة احتياطية</h2>
+      <p class="backup-desc">احفظ سجل متابعتك بالكامل (الأذكار المُنجزة يوميًا) في ملف واحد يمكنك حفظه أو نقله إلى جهاز آخر.</p>
+      <button class="btn-solid" id="btn-export">⭳ تنزيل نسخة احتياطية (JSON)</button>
+    </div>
+    <div class="backup-card">
+      <h2 class="section-title">استعادة نسخة احتياطية</h2>
+      <p class="backup-desc">اختر ملف نسخة احتياطية تم تصديره سابقًا لاستعادة سجل متابعتك. سيتم دمجه مع البيانات الحالية.</p>
+      <label class="btn-ghost file-btn">
+        اختيار ملف
+        <input type="file" id="file-import" accept="application/json">
+      </label>
+      <p class="backup-status" id="import-status"></p>
+    </div>
+    <div class="backup-card danger">
+      <h2 class="section-title">إعادة ضبط كاملة</h2>
+      <p class="backup-desc">حذف كل سجلات المتابعة نهائيًا من هذا الجهاز. لا يمكن التراجع عن هذا الإجراء إلا باستعادة نسخة احتياطية.</p>
+      <button class="btn-danger" id="btn-wipe">حذف جميع البيانات</button>
+    </div>
+  </section>
+
+</main>
+
+<footer class="app-footer">
+  <p>اللهم اجعلنا من الذاكرين الله كثيرًا والذاكرات، وتقبل منّا صالح الأعمال 🤲</p>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
