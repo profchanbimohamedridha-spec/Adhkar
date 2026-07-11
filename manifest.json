@@ -1,0 +1,25 @@
+{
+  "background_color": "#ffffff",
+  "description": "تطبيق متابعة أذكار الصباح والمساء، مستلة من كتاب الخلاصة الحسناء للشيخ صالح العصيمي",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "bejewelled-treacle-4af91b.netlify",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "bejewelled-treacle-4af91b.netlify",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,&lt;svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"&gt;&lt;text y=\".9em\" font-size=\"90\"&gt;🌙&lt;/text&gt;&lt;/svg&gt;",
+      "isSquare": false,
+      "isPng": false,
+      "isWebp": false,
+      "isJpg": false,
+      "width": 0,
+      "is512x512": false,
+      "is256x256": false,
+      "is192x192": false
+    }
+  ]
+}
